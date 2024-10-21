@@ -11,7 +11,12 @@ data class Pokemon(
     val id: Int
         get() = url.dropLast(1).takeLastWhile { it.isDigit() }.toInt()
 
-    // Construir la URL de la imagen
-    val imageUrl: String
+    val imageUrlFront: String
         get() = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/$id.png"
+    val imageUrlBack: String
+        get() = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/$id.png"
+    val imageUrlShinyFront: String
+        get() = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/$id.png"
+    val imageUrlShinyBack: String
+        get() = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/$id.png"
 }

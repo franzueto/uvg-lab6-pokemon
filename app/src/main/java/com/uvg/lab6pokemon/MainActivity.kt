@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -20,20 +21,22 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
-import coil.compose.rememberImagePainter
 import com.uvg.lab6pokemon.network.Pokemon
 import com.uvg.lab6pokemon.network.RetrofitClient
 import com.uvg.lab6pokemon.ui.theme.Lab6PokemonTheme
@@ -46,16 +49,32 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             Lab6PokemonTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { padding ->
-                    PokemonListScreen(Modifier.padding(padding))
-                }
+                PokemonApp()
             }
         }
     }
 }
 
 @Composable
-fun PokemonListScreen(modifier: Modifier) {
+fun PokemonApp() {
+    val navController = rememberNavController()
+
+    NavHost(navController = navController, startDestination = "pokemon_list") {
+        composable("pokemon_list") {
+            PokemonListScreen(navController)
+        }
+        composable("pokemon_detail/{name}/{id}") { backStackEntry ->
+            val name = backStackEntry.arguments?.getString("name")
+            val id = backStackEntry.arguments?.getString("id")?.toIntOrNull()
+            if (name != null && id != null) {
+                PokemonDetailScreen(name, id)
+            }
+        }
+    }
+}
+
+@Composable
+fun PokemonListScreen(navController: NavHostController) {
     val pokemonList = remember { mutableStateOf<List<Pokemon>>(emptyList()) }
     val coroutineScope = rememberCoroutineScope()
 
@@ -76,30 +95,33 @@ fun PokemonListScreen(modifier: Modifier) {
             verticalArrangement = Arrangement.spacedBy(8.dp) // Espacio entre cada item
         ) {
             items(pokemonList.value) { pokemon ->
-                PokemonCard(pokemon)
+                PokemonCard(pokemon, navController)
             }
         }
     }
 }
 
 @Composable
-fun PokemonCard(pokemon: Pokemon) {
+fun PokemonCard(pokemon: Pokemon, navController: NavHostController) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
-        //elevation = 4.dp,
+            .padding(8.dp)
+            .clickable {
+                // Navegación a la pantalla de detalles
+                navController.navigate("pokemon_detail/${pokemon.name}/${pokemon.id}")
+            },
         shape = RoundedCornerShape(8.dp),
-        //backgroundColor = Color.LightGray
     ) {
         Row(
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .padding(16.dp)
                 .fillMaxWidth()
         ) {
             // Imagen del Pokémon
             Image(
-                painter = rememberAsyncImagePainter(model = pokemon.imageUrl),
+                painter = rememberAsyncImagePainter(model = pokemon.imageUrlFront),
                 contentDescription = pokemon.name,
                 modifier = Modifier
                     .size(64.dp)
@@ -110,8 +132,7 @@ fun PokemonCard(pokemon: Pokemon) {
             // Nombre del Pokémon
             Text(
                 text = pokemon.name.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() },
-                style = MaterialTheme.typography.headlineSmall,
-                modifier = Modifier.alignByBaseline()
+                style = MaterialTheme.typography.headlineSmall
             )
         }
     }
@@ -130,7 +151,7 @@ fun PokemonListScreenPreview() {
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         items(samplePokemonList) { pokemon ->
-            PokemonCard(pokemon)
+            PokemonCard(pokemon, rememberNavController())
         }
     }
 }
