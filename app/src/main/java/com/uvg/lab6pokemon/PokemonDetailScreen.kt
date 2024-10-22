@@ -21,8 +21,8 @@ import com.uvg.lab6pokemon.network.Pokemon
 import java.util.Locale
 
 @Composable
-fun PokemonDetailScreen(name: String, id: Int) {
-    val pokemon = remember { Pokemon(name, "https://pokeapi.co/api/v2/pokemon/$id/") }
+fun PokemonDetailScreen(name: String, id: String) {
+    val pokemon = remember { Pokemon(name, id) }
 
     Column(
         modifier = Modifier
@@ -75,5 +75,5 @@ fun PokemonDetailScreen(name: String, id: Int) {
 @Preview(showBackground = true)
 @Composable
 fun PokemonDetailPreview() {
-    PokemonDetailScreen(name = "Pikachu", id = 25)
+    PokemonDetailScreen(name = "Pikachu", id = "25")
 }
