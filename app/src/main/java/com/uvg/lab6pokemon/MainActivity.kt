@@ -1,6 +1,7 @@
 package com.uvg.lab6pokemon
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -37,6 +38,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.firestore
+import com.uvg.lab6pokemon.network.PokeResponse
 import com.uvg.lab6pokemon.network.Pokemon
 import com.uvg.lab6pokemon.network.RetrofitClient
 import com.uvg.lab6pokemon.ui.theme.Lab6PokemonTheme
@@ -80,8 +84,26 @@ fun PokemonListScreen(navController: NavHostController) {
 
     LaunchedEffect(Unit) {
         coroutineScope.launch {
-            val response = RetrofitClient.apiService.getPokemonList(100)  // Puedes cambiar el límite aquí
-            pokemonList.value = response.results
+            val db = Firebase.firestore
+
+            db.collection("pokemon").document("all")
+                .get()
+                .addOnSuccessListener { document ->
+                    if (document != null) {
+                        Log.d("pokeapp", "DocumentSnapshot data: ${document.data}")
+
+                        val pokemonResponse: PokeResponse? = document.toObject(PokeResponse::class.java)
+                        pokemonList.value = pokemonResponse?.results ?: emptyList()
+                    } else {
+                        Log.d("pokeapp", "No such document")
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    Log.w("pokeapp", "Error getting documents.", exception)
+                }
+
+            //val response = RetrofitClient.apiService.getPokemonList(100)  // Puedes cambiar el límite aquí
+            //pokemonList.value = response.results
         }
     }
 

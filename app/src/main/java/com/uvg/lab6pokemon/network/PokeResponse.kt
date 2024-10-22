@@ -1,6 +1,12 @@
 package com.uvg.lab6pokemon.network
 
-data class PokeResponse(val results: List<Pokemon>)
+data class PokeResponse(val results: List<Pokemon>) {
+
+    // Firebase needs an empty constructor to serialize the info
+    // DO-NOT-REMOVE
+    @Suppress("unused")
+    constructor() : this(emptyList())
+}
 
 // Modelo para el Pokémon (simplificado)
 data class Pokemon(
@@ -19,4 +25,9 @@ data class Pokemon(
         get() = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/$id.png"
     val imageUrlShinyBack: String
         get() = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/$id.png"
+
+    // Firebase needs an empty constructor to serialize the info
+    // DO-NOT-REMOVE
+    @Suppress("unused")
+    constructor() : this("", "")
 }
