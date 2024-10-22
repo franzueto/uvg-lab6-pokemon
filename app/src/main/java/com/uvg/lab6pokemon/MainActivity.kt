@@ -1,6 +1,7 @@
 package com.uvg.lab6pokemon
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -37,11 +38,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.firestore
+import com.uvg.lab6pokemon.network.PokeResponse
 import com.uvg.lab6pokemon.network.Pokemon
-import com.uvg.lab6pokemon.network.RetrofitClient
 import com.uvg.lab6pokemon.ui.theme.Lab6PokemonTheme
 import kotlinx.coroutines.launch
 import java.util.Locale
+
+private const val TAG = "pokemon-app"
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,7 +70,7 @@ fun PokemonApp() {
         }
         composable("pokemon_detail/{name}/{id}") { backStackEntry ->
             val name = backStackEntry.arguments?.getString("name")
-            val id = backStackEntry.arguments?.getString("id")?.toIntOrNull()
+            val id = backStackEntry.arguments?.getString("id")
             if (name != null && id != null) {
                 PokemonDetailScreen(name, id)
             }
@@ -80,8 +85,18 @@ fun PokemonListScreen(navController: NavHostController) {
 
     LaunchedEffect(Unit) {
         coroutineScope.launch {
-            val response = RetrofitClient.apiService.getPokemonList(100)  // Puedes cambiar el límite aquí
-            pokemonList.value = response.results
+            val db = Firebase.firestore
+            db.collection("pokemon").document("all")
+                .get()
+                .addOnSuccessListener { document ->
+                    Log.d(TAG, "${document.id} => ${document.data}")
+
+                    val results = document.toObject(PokeResponse::class.java)
+                    pokemonList.value = results?.results ?: emptyList()
+                }
+                .addOnFailureListener { exception ->
+                    Log.w(TAG, "Error getting documents.", exception)
+                }
         }
     }
 
@@ -142,8 +157,8 @@ fun PokemonCard(pokemon: Pokemon, navController: NavHostController) {
 @Composable
 fun PokemonListScreenPreview() {
     val samplePokemonList = listOf(
-        Pokemon(name = "pikachu", url = "https://pokeapi.co/api/v2/pokemon/25/"),
-        Pokemon(name = "bulbasaur", url = "https://pokeapi.co/api/v2/pokemon/1/")
+        Pokemon(name = "pikachu", id = "25"),
+        Pokemon(name = "bulbasaur", id = "1")
     )
 
     LazyColumn(

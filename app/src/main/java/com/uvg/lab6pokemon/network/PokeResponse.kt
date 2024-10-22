@@ -1,15 +1,19 @@
 package com.uvg.lab6pokemon.network
 
-data class PokeResponse(val results: List<Pokemon>)
+data class PokeResponse(val results: List<Pokemon>) {
+    // Firebase requires an empty constructor to deserialize objects
+    @Suppress("unused")
+    constructor() : this(emptyList())
+}
 
 // Modelo para el Pokémon (simplificado)
 data class Pokemon(
     val name: String,
-    val url: String
+    val id: String
 ) {
-    // Extraer el ID del Pokémon desde la URL
-    val id: Int
-        get() = url.dropLast(1).takeLastWhile { it.isDigit() }.toInt()
+    // Firebase requires an empty constructor to deserialize objects
+    @Suppress("unused")
+    constructor() : this("", "")
 
     val imageUrlFront: String
         get() = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/$id.png"
