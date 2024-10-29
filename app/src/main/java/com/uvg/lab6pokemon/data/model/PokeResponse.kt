@@ -1,4 +1,4 @@
-package com.uvg.lab6pokemon.network
+package com.uvg.lab6pokemon.data.model
 
 data class PokeResponse(val results: List<Pokemon>) {
 

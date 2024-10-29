@@ -1,4 +1,4 @@
-package com.uvg.lab6pokemon.network
+package com.uvg.lab6pokemon.data.remote
 
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory

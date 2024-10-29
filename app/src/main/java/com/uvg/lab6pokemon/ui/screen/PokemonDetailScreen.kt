@@ -1,4 +1,4 @@
-package com.uvg.lab6pokemon
+package com.uvg.lab6pokemon.ui.screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -17,7 +17,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
-import com.uvg.lab6pokemon.network.Pokemon
+import com.uvg.lab6pokemon.data.model.Pokemon
 import java.util.Locale
 
 @Composable

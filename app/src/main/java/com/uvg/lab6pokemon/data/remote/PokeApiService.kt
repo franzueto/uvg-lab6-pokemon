@@ -1,5 +1,6 @@
-package com.uvg.lab6pokemon.network
+package com.uvg.lab6pokemon.data.remote
 
+import com.uvg.lab6pokemon.data.model.PokeResponse
 import retrofit2.http.GET
 import retrofit2.http.Query
 
