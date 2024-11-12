@@ -18,17 +18,17 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.uvg.lab6pokemon.data.model.Pokemon
 import com.uvg.lab6pokemon.ui.component.PokemonCard
 import com.uvg.lab6pokemon.viewmodel.PokemonViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun PokemonListScreen(
     navController: NavHostController,
-    viewModel: PokemonViewModel = viewModel( factory = PokemonViewModel.RetrofitFactory )
+    viewModel: PokemonViewModel = koinViewModel()
 ) {
     val pokemonList by viewModel.pokemonList.observeAsState(emptyList())
 
